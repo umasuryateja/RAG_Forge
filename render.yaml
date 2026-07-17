@@ -1,27 +1,27 @@
 services:
-  # 1. Backend FastAPI Web Service
+  # 1. Backend FastAPI Web Service (Native Python)
   - type: web
     name: ragforge-backend
-    runtime: docker
-    plan: free # Explicitly using Free Tier (Note: databases/uploads will be ephemeral)
+    runtime: python
+    plan: free
     rootDir: backend
-    dockerfilePath: Dockerfile
-    dockerContext: .
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "python -m uvicorn app.main:app --host 0.0.0.0 --port $PORT"
     envVars:
       - key: GEMINI_API_KEY
         sync: false # Set in the Render Dashboard
       - key: PROJECT_NAME
         value: "Enterprise AI Knowledge Assistant"
       - key: DATABASE_URL
-        value: "sqlite:////app/sql_app.db" # Ephemeral SQLite path inside container
+        value: "sqlite:///./sql_app.db" # Ephemeral database file inside backend/ directory
       - key: BACKEND_CORS_ORIGINS
         value: "https://ragforge-frontend.onrender.com,http://localhost:5173"
       - key: CHROMA_DB_PATH
-        value: "/app/chroma_db" # Ephemeral vector database path
+        value: "chroma_db" # Ephemeral vector database path relative to backend/
       - key: CHROMA_COLLECTION_NAME
         value: "documents"
       - key: UPLOAD_DIR
-        value: "/app/uploads" # Ephemeral physical PDF storage path
+        value: "uploads" # Ephemeral uploads path relative to backend/
       - key: CHUNK_SIZE
         value: "800"
       - key: CHUNK_OVERLAP
@@ -29,13 +29,13 @@ services:
       - key: LOG_LEVEL
         value: "INFO"
       - key: LOG_FILE
-        value: "/app/logs/app.log" # Ephemeral log path
+        value: "logs/app.log" # Ephemeral log file path relative to backend/
 
   # 2. Frontend React static site
   - type: web
     name: ragforge-frontend
     runtime: static
-    plan: free # Static sites are always free on Render
+    plan: free
     rootDir: frontend
     buildCommand: "npm install && npm run build"
     staticPublishPath: "dist"
