@@ -1,0 +1,41 @@
+# Environments & Dependency Folders
+venv/
+venv_new/
+.env
+.env.local
+.env.*.local
+node_modules/
+frontend/node_modules/
+
+# Python caching
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Database files
+*.db
+sql_app.db
+
+# Backend & root local-only storage folders
+backend/.env
+backend/chroma_db/
+backend/logs/
+backend/uploads/
+chroma_db/
+logs/
+
+# Build assets
+dist/
+frontend/dist/
+frontend/dist-ssr/
+
+# Temporary generated files
+backend/test_small.pdf
+backend/test_large.pdf
+backend/test_duplicate.pdf
+
+# Editor & OS files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
