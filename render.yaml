@@ -1,0 +1,50 @@
+services:
+  # 1. Backend FastAPI Web Service
+  - type: web
+    name: ragforge-backend
+    env: docker
+    dockerfilePath: backend/Dockerfile
+    dockerContext: backend
+    plan: starter # Starter plan recommended for ChromaDB indexing memory
+    envVars:
+      - key: GEMINI_API_KEY
+        sync: false # Set in the Render Dashboard
+      - key: PROJECT_NAME
+        value: "Enterprise AI Knowledge Assistant"
+      - key: DATABASE_URL
+        value: "sqlite:///./sql_app.db"
+      - key: BACKEND_CORS_ORIGINS
+        value: "https://ragforge-frontend.onrender.com,http://localhost:5173"
+      - key: CHROMA_DB_PATH
+        value: "chroma_db"
+      - key: CHROMA_COLLECTION_NAME
+        value: "documents"
+      - key: UPLOAD_DIR
+        value: "uploads"
+      - key: CHUNK_SIZE
+        value: "800"
+      - key: CHUNK_OVERLAP
+        value: "150"
+      - key: LOG_LEVEL
+        value: "INFO"
+      - key: LOG_FILE
+        value: "logs/app.log"
+    # Mount persistent disk so ChromaDB indexes and uploaded files survive redeployments
+    disk:
+      name: ragforge-storage
+      mountPath: /app/chroma_db
+      sizeGB: 10
+
+  # 2. Frontend React static site
+  - type: web
+    name: ragforge-frontend
+    env: static
+    buildCommand: npm install && npm run build
+    publishPath: dist
+    headers:
+      - path: /*
+        name: Cache-Control
+        value: max-age=31536000
+    envVars:
+      - key: VITE_API_URL
+        value: "https://ragforge-backend.onrender.com" # Replace with actual deployed backend URL if different
