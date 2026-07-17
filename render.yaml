@@ -3,8 +3,9 @@ services:
   - type: web
     name: ragforge-backend
     env: docker
-    dockerfilePath: backend/Dockerfile
-    dockerContext: backend
+    rootDir: backend
+    dockerfilePath: Dockerfile
+    dockerContext: .
     plan: starter # Starter plan recommended for ChromaDB memory requirements
     envVars:
       - key: GEMINI_API_KEY
@@ -39,8 +40,9 @@ services:
   - type: web
     name: ragforge-frontend
     env: static
-    buildCommand: "cd frontend && npm install && npm run build"
-    publishPath: "frontend/dist"
+    rootDir: frontend
+    buildCommand: "npm install && npm run build"
+    publishPath: "dist"
     headers:
       - path: /*
         name: Cache-Control
