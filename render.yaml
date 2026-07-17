@@ -2,7 +2,7 @@ services:
   # 1. Backend FastAPI Web Service
   - type: web
     name: ragforge-backend
-    env: docker
+    runtime: docker
     rootDir: backend
     dockerfilePath: Dockerfile
     dockerContext: .
@@ -39,7 +39,7 @@ services:
   # 2. Frontend React static site
   - type: web
     name: ragforge-frontend
-    env: static
+    runtime: static
     rootDir: frontend
     buildCommand: "npm install && npm run build"
     publishPath: "dist"
