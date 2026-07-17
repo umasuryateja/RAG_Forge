@@ -5,22 +5,22 @@ services:
     env: docker
     dockerfilePath: backend/Dockerfile
     dockerContext: backend
-    plan: starter # Starter plan recommended for ChromaDB indexing memory
+    plan: starter # Starter plan recommended for ChromaDB memory requirements
     envVars:
       - key: GEMINI_API_KEY
         sync: false # Set in the Render Dashboard
       - key: PROJECT_NAME
         value: "Enterprise AI Knowledge Assistant"
       - key: DATABASE_URL
-        value: "sqlite:///./sql_app.db"
+        value: "sqlite:////app/data/sql_app.db" # Persistent SQLite DB path
       - key: BACKEND_CORS_ORIGINS
         value: "https://ragforge-frontend.onrender.com,http://localhost:5173"
       - key: CHROMA_DB_PATH
-        value: "chroma_db"
+        value: "/app/data/chroma_db" # Persistent vector database path
       - key: CHROMA_COLLECTION_NAME
         value: "documents"
       - key: UPLOAD_DIR
-        value: "uploads"
+        value: "/app/data/uploads" # Persistent physical PDF storage path
       - key: CHUNK_SIZE
         value: "800"
       - key: CHUNK_OVERLAP
@@ -28,19 +28,19 @@ services:
       - key: LOG_LEVEL
         value: "INFO"
       - key: LOG_FILE
-        value: "logs/app.log"
-    # Mount persistent disk so ChromaDB indexes and uploaded files survive redeployments
+        value: "/app/data/logs/app.log" # Persistent log file path
+    # Mount persistent disk so ChromaDB indexes, sqlite database, physical uploads, and logs survive restarts
     disk:
       name: ragforge-storage
-      mountPath: /app/chroma_db
+      mountPath: /app/data
       sizeGB: 10
 
   # 2. Frontend React static site
   - type: web
     name: ragforge-frontend
     env: static
-    buildCommand: npm install && npm run build
-    publishPath: dist
+    buildCommand: "cd frontend && npm install && npm run build"
+    publishPath: "frontend/dist"
     headers:
       - path: /*
         name: Cache-Control
